@@ -1,22 +1,17 @@
-const connectToMongo = require('./db');
-connectToMongo();
-
-
+//Run the express server with npm run serve
 const express = require('express')
+const connectToMongo = require('./db')
+
+connectToMongo()
 const app = express()
 const port = 3000
 
+app.use(express.json())
 
-//These are the diffrent endpoints
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
-app.get('/login', (req, res) => {
-  res.send('Hello login!')
-})
-app.get('/signup', (req, res) => {
-  res.send('Hello signup!')
-})
+//These are the diffrent api endpoints (auth, notes)/routes available to us
+app.use("/api/auth", require("./routes/auth"))
+app.use("/api/notes", require("./routes/notes"))
+
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
