@@ -4,11 +4,12 @@ const router = express.Router()
 const { body, validationResult } = require('express-validator')
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
+const fetchuser = require("../middleware/fetchuser")
 
 const JWT_SECRET = "IAmLearningWebDevlopement"
 
 //without router we would do app.get(req, res) here req is request and res is response
-//Create a user using: POST "/api/auth/createuser". Dosent require Authentication, no login required
+//Route 1: Create a user using: POST "/api/auth/createuser". Dosent require Authentication, no login required
 
 router.post("/createuser", [
     body('name', "Minimum Name Length is 5").isLength({ min: 5 }),
@@ -65,7 +66,7 @@ router.post("/createuser", [
 
 
 
-//Authenticate a user using POST  */api/auth/login*. No login required
+//Route 2: Authenticate/Login a user using POST  */api/auth/login*. No login required
 
 router.post("/login", [
     body('email', "Enter a valid Email").isEmail(),
@@ -105,6 +106,20 @@ router.post("/login", [
         res.status(500).send("Internal Server Error")
     }
 
+})
+
+//Route 3: Get logged in user details using POST  */api/auth/getuser*.Login required
+
+router.post("/getuser", fetchuser, async (req, res) => {
+
+    try{
+        userId = req.user.id
+        const user = await User.findById(userId).select("-password")
+        res.send(user)
+    } catch (error) {
+        console.error(error.message)
+        res.status(500).send("Internal Server Error")
+    }
 })
 
 module.exports = router
